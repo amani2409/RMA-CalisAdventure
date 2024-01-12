@@ -33,14 +33,14 @@
             }*!/
        };*/
 
-    // var player;
-    // var carrots;
-    // var bombs;
-    // var platforms;
-    // var cursors;
-    // var score = 0;
-    // var gameOver = false;
-    // var scoreText;
+    var player;
+    var carrots;
+    var bombs;
+    var platforms;
+    var cursors;
+    var score = 0;
+    var gameOver = false;
+    var scoreText;
 
     // var game = new Phaser.Game(config);
 
@@ -49,6 +49,8 @@
 
 
     var titleScreen = new Phaser.Scene("titleScreen");
+    var gameScene = new Phaser.Scene("game");
+
 
     titleScreen.preload = function () {
         // this.load.setBaseURL("https://digitherium.com/codepen/phaserplatformer/");
