@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Calis Adventure</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+    <style type="text/css">
+        body {
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+<script type="text/javascript">
+
+    /*   var config = {
+           type: Phaser.AUTO,
+           width: 800,
+           height: 600,
+           physics: {
+               default: 'arcade',
+               arcade: {
+                   gravity: {y: 300},
+                   debug: false
+               }
+           },
+
+           scene: [titleScreen, gameScene, endScreen]
+           /!* scene: {
+                preload: preload,
+                create: create,
+                update: update
+            }*!/
+       };*/
+
+    // var player;
+    // var carrots;
+    // var bombs;
+    // var platforms;
+    // var cursors;
+    // var score = 0;
+    // var gameOver = false;
+    // var scoreText;
+
+    // var game = new Phaser.Game(config);
+
+    //We now have 3 scenes. To start with the start Screen
+    // var titleScreen = new Phaser.Scene("titleScreen");
+
+
+    var titleScreen = new Phaser.Scene("titleScreen");
+
+    titleScreen.preload = function () {
+        // this.load.setBaseURL("https://digitherium.com/codepen/phaserplatformer/");
+
+        // this.load.image('background', 'assets/background.png');
+
+        this.load.image("logo", "assets/background.png");
+    }
+
+    titleScreen.create = function () {
+        var logo = this.add.sprite(config.width / 2, config.height / 2 - 40, 'logo');
+
+        //add some text
+        this.add.text(config.width / 2, config.height / 2 + 70, 'CLICK TO START', {
+            fontSize: 32,
+            color: '#ffffff'
+        }).setShadow(4, 4, "#000000", 2, false, true).setOrigin(0.5);
+
+        //add click / tap to start game
+        this.input.on('pointerdown', function (pointer) {
+            titleScreen.scene.start('game');
+        });
+    }
+
+    //Our end screen, the order isn't important, but including it here as it is shorter than the game
+    var endScreen = new Phaser.Scene("endScreen");
+
+    endScreen.create = function () {
+        var logo = this.add.sprite(config.width / 2, config.height / 2 - 40, 'logo');
+
+        //add some text
+        this.add.text(config.width / 2, config.height / 2 + 70, 'GAME OVER\nCLICK TO RESTART', {
+            fontSize: 32,
+            color: '#ffffff',
+            align: 'center'
+        }).setShadow(4, 4, "#000000", 2, false, true).setOrigin(0.5);
+
+        this.input.on('pointerdown', function (pointer) {
+            //shut down this scene and start up the game scene
+            endScreen.scene.start('game');
+            //restart the scene to reset all the variables!
+            gameScene.scene.restart();
+        });
+    }
+
+    var gameScene = new Phaser.Scene("game");
+
+    gameScene.init = function () {
+        var player;
+        var carrots;
+        var bombs;
+        var platforms;
+        var cursors;
+        var score = 0;
+        var gameOver = false;
+        var scoreText;
+    }
+    gameScene.preload = function () {
+        {
+            this.load.image('background', 'assets/background.png');
+            this.load.image('ground', 'assets/ground1.png');
+            this.load.image('carrot', 'assets/carrot.png');
+            this.load.spritesheet('bunny', 'assets/bunnysprite2.png', {frameWidth: 80, frameHeight: 50});
+
+            this.load.image('bomb', 'assets/bunny.png');
+
+        }
+
+// function create ()
+// {
+        gameScene.create = function () {
+
+            //  A simple background for our game
+            this.add.image(400, 300, 'background');
+
+            //  The platforms group contains the ground and the 2 ledges we can jump on
+            platforms = this.physics.add.staticGroup();
+
+            //  Here we create the ground.
+            //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+            platforms.create(400, 580, 'ground').setScale(2).refreshBody();
+
+            //  Now let's create some ledges
+            // platforms.create(600, 400, 'ground');
+            // platforms.create(50, 250, 'ground');
+            // platforms.create(750, 220, 'ground');
+
+            // The player and its settings
+            player = this.physics.add.sprite(100, 450, 'bunny');
+
+            //  Player physics properties. Give the little guy a slight bounce.
+            player.setBounce(0.2);
+            player.setCollideWorldBounds(true);
+
+            //  Our player animations, turning, walking left and walking right.
+            this.anims.create({
+                key: 'left',
+                frames: this.anims.generateFrameNumbers('bunny', {start: 0, end: 2}),
+                frameRate: 10,
+                repeat: -1
+            });
+
+            this.anims.create({
+                key: 'turn',
+                frames: [{key: 'bunny', frame: 5}],
+                frameRate: 20
+            });
+
+            this.anims.create({
+                key: 'right',
+                frames: this.anims.generateFrameNumbers('bunny', {start: 3, end: 5}),
+                frameRate: 10,
+                repeat: -1
+            });
+
+            this.anims.create({
+                key: 'down',
+                frames: [{key: 'bunny', frame: 6}],
+                frameRate: 20
+            });
+
+            //  Input Events
+            cursors = this.input.keyboard.createCursorKeys();
+
+            //  Some carrots to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+            carrots = this.physics.add.group({
+                key: 'carrot',
+                repeat: 11,
+                setXY: {x: 12, y: 0, stepX: 70}
+            });
+
+            carrots.children.iterate(function (child) {
+
+                //  Give each star a slightly different bounce
+                child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+
+            });
+
+            bombs = this.physics.add.group();
+
+            //  The score
+            scoreText = this.add.text(16, 16, 'score: 0', {fontSize: '32px', fill: '#000'});
+
+            //  Collide the player and the carrots with the platforms
+            this.physics.add.collider(player, platforms);
+            this.physics.add.collider(carrots, platforms);
+            this.physics.add.collider(bombs, platforms);
+
+            //  Checks to see if the player overlaps with any of the carrots, if he does call the collectCarrots function
+            this.physics.add.overlap(player, carrots, collectCarrots, null, this);
+
+            this.physics.add.collider(player, bombs, hitBomb, null, this);
+        }
+    }
+
+
+    // function update ()
+    // {
+    gameScene.update = function () {
+
+        if (gameOver) {
+            return;
+        }
+
+        if (cursors.left.isDown) {
+            player.setVelocityX(-160);
+
+            player.anims.play('left', true);
+        } else if (cursors.right.isDown) {
+            player.setVelocityX(160);
+
+            player.anims.play('right', true);
+        } else if (cursors.down.isDown) {
+            player.setVelocityX(0);
+
+            player.anims.play('down');
+        } else {
+            player.setVelocityX(0);
+
+            player.anims.play('turn');
+        }
+
+        if (cursors.up.isDown && player.body.touching.down) {
+            player.setVelocityY(-330);
+        }
+    }
+    function restartGame(scene) {
+        game.scene.switch('game', 'endScreen');
+    }
+
+    function collectCarrots(player, star) {
+        star.disableBody(true, true);
+
+        //  Add and update the score
+        score += 10;
+        scoreText.setText('Score: ' + score);
+
+        if (carrots.countActive(true) === 0) {
+            //  A new batch of carrots to collect
+            carrots.children.iterate(function (child) {
+
+                child.enableBody(true, child.x, 0, true, true);
+
+            });
+
+            var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+
+            var bomb = bombs.create(x, 16, 'bomb');
+            bomb.setBounce(1);
+            bomb.setCollideWorldBounds(true);
+            bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+            bomb.allowGravity = false;
+
+        }
+    }
+
+    function hitBomb(player, bomb) {
+        this.physics.pause();
+
+        player.setTint(0xff0000);
+
+        player.anims.play('turn');
+
+        gameOver = true;
+    }
+
+
+    /*  //We now have 3 scenes. To start with the start Screen
+      var titleScreen = new Phaser.Scene("titleScreen");
+
+    /!*  titleScreen.preload = function() {
+        this.load.setBaseURL("https://digitherium.com/codepen/phaserplatformer/");
+        this.load.image("logo", "digitherium-logo.jpg");
+      }*!/
+
+      titleScreen.create = function() {
+        var logo = this.add.sprite(config.width / 2, config.height / 2 - 40, 'logo');
+
+        //add some text
+        this.add.text(config.width / 2, config.height / 2 + 70, 'CLICK TO START', { fontSize: 32, color: '#ffffff' }).setShadow(4, 4, "#000000", 2, false, true).setOrigin(0.5);
+
+        //add click / tap to start game
+        this.input.on('pointerdown', function(pointer) {
+          titleScreen.scene.start('game');
+        });
+      }*/
+
+    //Our end screen, the order isn't important, but including it here as it is shorter than the game
+/*    var endScreen = new Phaser.Scene("endScreen");
+
+    endScreen.create = function () {
+        var logo = this.add.sprite(config.width / 2, config.height / 2 - 40, 'logo');
+
+        //add some text
+        this.add.text(config.width / 2, config.height / 2 + 70, 'GAME OVER\nCLICK TO RESTART', {
+            fontSize: 32,
+            color: '#ffffff',
+            align: 'center'
+        }).setShadow(4, 4, "#000000", 2, false, true).setOrigin(0.5);
+
+        this.input.on('pointerdown', function (pointer) {
+            //shut down this scene and start up the game scene
+            endScreen.scene.start('game');
+            //restart the scene to reset all the variables!
+            gameScene.scene.restart();
+        });
+    }
+
+    var gameScene = new Phaser.Scene("game");
+
+    //the majority of the global variables are now initialised here
+    gameScene.init = function () {
+        this.score = 0;
+        this.maxHearts = 3;
+        this.vulnerableTime = 1000;
+        this.acceleration = 600;
+        this.maxPlayerSpeed = 200;
+        this.superPlayerSpeed = 400;
+        this.jumpVelocity = -165;
+        this.jumpVelocitySmall = -165;
+        this.jumpVelocityBig = -330;
+        this.standing = true;
+        this.wasStanding = false;
+        this.onLadder = false;
+        this.edgeTimer = 0;
+        this.prevPos = 0;
+        this.yPos = 0;
+        this.touchJump = false;
+        this.touchJumpThreshold = 5;
+        this.touchMoving = false;
+        this.isTouch = false;
+        this.touchMoveThreshold = 3;
+        this.largeThumbMoveAcross = 25;
+        this.thumbSizeOffset = 60;
+        this.shellSpeed = 500;
+        this.heroColor = new Phaser.Display.Color(255, 255, 255);
+        this.invincibleColor = new Phaser.Display.Color(56, 194, 239);
+        this.coinTweens = [];
+    };*/
+
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: {y: 300},
+                debug: false
+            }
+        },
+
+        scene: [titleScreen, gameScene, endScreen]
+        /* scene: {
+             preload: preload,
+             create: create,
+             update: update
+         }*/
+    };
+
+    var game = new Phaser.Game(config);
+
+</script>
+</body>
+</html>
