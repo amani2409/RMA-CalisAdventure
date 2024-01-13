@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
+    <meta charset="UTF-8"/>
     <title>Calis Adventure</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
@@ -14,207 +14,308 @@
 
 <script type="text/javascript">
 
-var config = {
-    type: Phaser.AUTO,
-    width: 800,
-    height: 600,
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 300 },
-            debug: false
-        }
-    },
-    scene: {
-        preload: preload,
-        create: create,
-        update: update
-    }
-};
+    var player;
+    var carrots;
+    var dandelion;
+    var thyme;
+    var fox;
+    var platforms;
+    var cursors;
+    var health = 100;
+    var gameOver = false;
+    var healthText;
+    var jumpVelocity = -330;
+    var vulnerableTime = 1000;
 
-var player;
-var carrots;
-var bombs;
-var platforms;
-var cursors;
-var score = 0;
-var gameOver = false;
-var scoreText;
+    var titleScreen = new Phaser.Scene("titleScreen");
+    var levelScreen = new Phaser.Scene("levelScreen");
+    var gameScene = new Phaser.Scene("game");
+    var endScreen = new Phaser.Scene("endScreen");
 
-var game = new Phaser.Game(config);
+    titleScreen.preload = function () {
+        this.load.setBaseURL("assets");
 
-function preload ()
-{
-    this.load.image('background', 'assets/background.png');
-    this.load.image('ground', 'assets/ground1.png');
-    this.load.image('carrot', 'assets/carrot.png');
-    this.load.spritesheet('bunny', 'assets/bunnysprite2.png', { frameWidth: 80, frameHeight: 50 });
-
-    this.load.image('bomb', 'assets/bunny.png');
-
-}
-
-function create ()
-{
-    //  A simple background for our game
-    this.add.image(400, 300, 'background');
-
-    //  The platforms group contains the ground and the 2 ledges we can jump on
-    platforms = this.physics.add.staticGroup();
-
-    //  Here we create the ground.
-    //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    platforms.create(400, 580, 'ground').setScale(2).refreshBody();
-
-    //  Now let's create some ledges
-    // platforms.create(600, 400, 'ground');
-    // platforms.create(50, 250, 'ground');
-    // platforms.create(750, 220, 'ground');
-
-    // The player and its settings
-    player = this.physics.add.sprite(100, 450, 'bunny');
-
-    //  Player physics properties. Give the little guy a slight bounce.
-    player.setBounce(0.2);
-    player.setCollideWorldBounds(true);
-
-    //  Our player animations, turning, walking left and walking right.
-    this.anims.create({
-        key: 'left',
-        frames: this.anims.generateFrameNumbers('bunny', { start: 0, end: 2 }),
-        frameRate: 10,
-        repeat: -1
-    });
-
-    this.anims.create({
-        key: 'turn',
-        frames: [ { key: 'bunny', frame: 5 } ],
-        frameRate: 20
-    });
-
-    this.anims.create({
-        key: 'right',
-        frames: this.anims.generateFrameNumbers('bunny', { start: 3, end: 5 }),
-        frameRate: 10,
-        repeat: -1
-    });
-
-    this.anims.create({
-        key: 'down',
-        frames: [ { key: 'bunny', frame: 6 } ],
-        frameRate: 20
-    });
-
-    //  Input Events
-    cursors = this.input.keyboard.createCursorKeys();
-
-    //  Some carrots to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
-    carrots = this.physics.add.group({
-        key: 'carrot',
-        repeat: 11,
-        setXY: { x: 12, y: 0, stepX: 70 }
-    });
-
-    carrots.children.iterate(function (child) {
-
-        //  Give each star a slightly different bounce
-        child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-
-    });
-
-    bombs = this.physics.add.group();
-
-    //  The score
-    scoreText = this.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
-
-    //  Collide the player and the carrots with the platforms
-    this.physics.add.collider(player, platforms);
-    this.physics.add.collider(carrots, platforms);
-    this.physics.add.collider(bombs, platforms);
-
-    //  Checks to see if the player overlaps with any of the carrots, if he does call the collectCarrots function
-    this.physics.add.overlap(player, carrots, collectCarrots, null, this);
-
-    this.physics.add.collider(player, bombs, hitBomb, null, this);
-}
-
-function update ()
-{
-    if (gameOver)
-    {
-        return;
+        this.load.image("main", "background.png");
     }
 
-    if (cursors.left.isDown)
-    {
-        player.setVelocityX(-160);
+    titleScreen.create = function () {
+        this.add.image(400, 300, 'main');
 
-        player.anims.play('left', true);
-    }
-    else if (cursors.right.isDown)
-    {
-        player.setVelocityX(160);
+        //add some text
+        this.add.text(config.width / 2, config.height / 2 + 70, 'CLICK TO START', {
+            fontSize: 32,
+            color: '#ffffff'
+        }).setShadow(4, 4, "#000000", 2, false, true).setOrigin(0.5);
 
-        player.anims.play('right', true);
-    }
-    else if (cursors.down.isDown)
-    {
-        player.setVelocityX(0);
-
-        player.anims.play('down');
+        //add click / tap to start game
+        this.input.on('pointerdown', function (pointer) {
+            titleScreen.scene.start('game');
+        });
     }
 
-    else
-    {
-        player.setVelocityX(0);
+    endScreen.create = function () {
+        this.add.image(400, 300, 'main');
 
-        player.anims.play('turn');
+        //add some text
+        this.add.text(config.width / 2, config.height / 2 + 70, 'GAME OVER\nCLICK TO RESTART', {
+            fontSize: 32,
+            color: '#ffffff',
+            align: 'center'
+        }).setShadow(4, 4, "#000000", 2, false, true).setOrigin(0.5);
+
+        this.input.on('pointerdown', function (pointer) {
+            //shut down this scene and start up the game scene
+            endScreen.scene.start('game');
+            //restart the scene to reset all the variables!
+            gameScene.scene.restart();
+        });
     }
 
-    if (cursors.up.isDown && player.body.touching.down)
-    {
-        player.setVelocityY(-330);
+    gameScene.preload = function () {
+        this.load.setBaseURL("assets");
+        this.load.image('background', 'background.png');
+        this.load.image('ground', 'ground1.png');
+        this.load.image('carrot', 'carrot.png');
+        this.load.spritesheet('bunny', 'bunnysprite.png', {frameWidth: 80, frameHeight: 50}); //created my own bunny spritesheet
+
+        this.load.spritesheet('fox', 'fox.png', {frameWidth: 36, frameHeight: 21}); // from https://opengameart.org/content/fox-wolf-pack-rework
+
     }
-}
 
-function collectCarrots (player, star)
-{
-    star.disableBody(true, true);
+    gameScene.create = function () {
+        //  A simple background for our game
+        this.add.image(400, 300, 'background');
 
-    //  Add and update the score
-    score += 10;
-    scoreText.setText('Score: ' + score);
+        //  The platforms group contains the ground and the 2 ledges we can jump on
+        platforms = this.physics.add.staticGroup();
 
-    if (carrots.countActive(true) === 0)
-    {
-        //  A new batch of carrots to collect
+        //  Here we create the ground.
+        //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+        platforms.create(400, 580, 'ground').setScale(2).refreshBody();
+
+        // The player and its settings
+        player = this.physics.add.sprite(100, 450, 'bunny');
+
+        //  Player physics properties. Give the little guy a slight bounce.
+        player.setBounce(0.2);
+        player.setCollideWorldBounds(true);
+
+        //  Our player animations, turning, walking left and walking right.
+        this.anims.create({
+            key: 'left',
+            frames: this.anims.generateFrameNumbers('bunny', {start: 0, end: 2}),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'turn',
+            frames: [{key: 'bunny', frame: 5}],
+            frameRate: 20
+        });
+
+        this.anims.create({
+            key: 'right',
+            frames: this.anims.generateFrameNumbers('bunny', {start: 3, end: 5}),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
+            key: 'down',
+            frames: [{key: 'bunny', frame: 6}],
+            frameRate: 20
+        });
+
+        fox = this.physics.add.sprite(600,400, 'fox').setScale(3);
+        fox.setCollideWorldBounds(true);
+
+
+        this.anims.create({
+            key: 'foxWalking',
+            frames: this.anims.generateFrameNumbers('fox', {start: 3, end: 5}),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        fox.anims.play('foxWalking', true);
+
+
+        fox.body.velocity.x = -80;
+        // fox.maxDistance = 200;
+        fox.previousX = fox.x;
+
+        //  Input Events
+        cursors = this.input.keyboard.createCursorKeys();
+
+        //  Some carrots to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
+        carrots = this.physics.add.group({
+            key: 'carrot',
+            repeat: 11,
+            setXY: {x: 12, y: 0, stepX: 70}
+        });
+
         carrots.children.iterate(function (child) {
-
-            child.enableBody(true, child.x, 0, true, true);
+            //  Give each star a slightly different bounce
+            child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
 
         });
 
-        var x = (player.x < 400) ? Phaser.Math.Between(400, 800) : Phaser.Math.Between(0, 400);
+        //  The healthbar
+        healthText = this.add.text(16, 16, 'Health: 100', {fontSize: '32px', fill: '#000'});
 
-        var bomb = bombs.create(x, 16, 'bomb');
-        bomb.setBounce(1);
-        bomb.setCollideWorldBounds(true);
-        bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-        bomb.allowGravity = false;
+        //  Collide the player and the carrots with the platforms
+        this.physics.add.collider(player, platforms);
+        this.physics.add.collider(carrots, platforms);
+        this.physics.add.collider(fox, platforms);
+
+        //  Checks to see if the player overlaps with any of the carrots, if he does call the collectPlants function
+        this.physics.add.overlap(player, carrots, collectPlants, null, this);
+        this.physics.add.overlap(player, dandelion, collectPlants, null, this);
+        this.physics.add.overlap(player, thyme, collectPlants, null, this);
+
+        this.physics.add.overlap(player, fox, hitFox, null, this);
+    }
+
+    gameScene.update = function () {
+        if (gameOver) {
+            return;
+        }
+
+        if (cursors.left.isDown) {
+            player.setVelocityX(-160);
+
+            player.anims.play('left', true);
+        } else if (cursors.right.isDown) {
+            player.setVelocityX(160);
+
+            player.anims.play('right', true);
+
+        } else if (cursors.down.isDown) {
+            player.setVelocityX(0);
+
+            player.anims.play('down');
+        } else {
+            player.setVelocityX(0);
+
+            player.anims.play('turn');
+        }
+
+        if (cursors.up.isDown && player.body.touching.down) {
+            player.setVelocityY(-330);
+        }
+
 
     }
-}
 
-function hitBomb (player, bomb)
-{
-    this.physics.pause();
+    function restartGame(scene) {
+        gameScene.scene.start('endScreen');
+    }
 
-    player.setTint(0xff0000);
+    function collectPlants(player, plant) {
+        plant.disableBody(true, true);
 
-    player.anims.play('turn');
+        //  Add and update the Health
+        health += 10;
+        healthText.setText('Health: ' + health);
 
-    gameOver = true;
-}
+        if (carrots.countActive(true) === 100) {
+            //  A new batch of carrots to collect
+            carrots.children.iterate(function (child) {
+
+                child.enableBody(true, child.x, 0, true, true);
+
+            });
+
+        }
+    }
+
+    function hitFox(player, fox) {
+
+        if(fox.hit && health > 0){
+           fox.disableBody(false,false);
+           player.setVelocityY(jumpVelocity)
+
+            var tween = this.tweens.add({
+               targets: fox,
+                alpha: 0.3,
+                scaleX: 1.5,
+                scaleY: 1.5,
+                ease: 'Linear',
+                duration: 200,
+                onComplete: function() {
+                    destroyGameObject(fox);
+                },
+            });
+
+        }
+        else {
+            //if not invulnerable
+            if(!player.invulnerable){
+                player.invulnerable = true;
+
+                health -= 50;
+                healthText.setText('Health: ' + health);
+
+                if(health <= 0){
+                    restartGame();
+                }
+                else {
+                    player.body.velocity.x = 0;
+                    player.body.velocity.y = -220;
+
+                    var tween = this.tweens.add({
+                        targets: player,
+                        alpha: 0.8,
+                        ease: 'Linear',
+                        duration: 200,
+                        onCompleteScope: this
+                    });
+
+                    var timer = this.time.delayedCall(vulnerableTime, playerVulnerable, [this]);
+
+                }
+
+            }
+        }
+    }
+
+
+    function playerVulnerable(game) {
+        //tween player back to 100% opacity and reset invulnerability flag
+        var death = game.tweens.add({
+            targets: player,
+            alpha: 1,
+            ease: 'Linear',
+            duration: 200,
+            onComplete: function() {
+                player.invulnerable = false;
+            },
+            onCompleteScope: this
+        });
+    }
+
+    function destroyGameObject(gameObject) {
+        // Removes any game object from the screen
+        gameObject.destroy();
+    }
+
+    var config = {
+        type: Phaser.AUTO,
+        width: 800,
+        height: 600,
+        physics: {
+            default: 'arcade',
+            arcade: {
+                gravity: {y: 300},
+                debug: false
+            }
+        },
+        scene: [titleScreen, gameScene, endScreen]
+
+    };
+
+    var game = new Phaser.Game(config);
 
 </script>
 
