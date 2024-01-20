@@ -36,7 +36,8 @@
         jumpVelocity = -330,
         vulnerableTime = 1000,
         camera,
-        hud;
+        speechBubbleText,
+        messageAlert;
 
     var isPlayerMoving = false;
     // var isPlayerMovingLeft = false;
@@ -109,12 +110,15 @@
         this.load.image('tulip', 'tulip.png');
         this.load.image('lily', 'lily.png');
 
-
         this.load.spritesheet('bunny', 'bunnysprite.png', {frameWidth: 80, frameHeight: 50}); //created my own bunny spritesheet
 
+        // NPC
         this.load.spritesheet('bunnyNPC', 'bunnyspriteNpc.png', {frameWidth: 54, frameHeight: 50});
-
         this.load.spritesheet('fox', 'fox.png', {frameWidth: 36, frameHeight: 21}); // from https://opengameart.org/content/fox-wolf-pack-rework
+
+        // speechbubbles von Freepik und etwas bearbeitet
+        this.load.image('speechbubble_alert', 'speechbubble_alert.png');
+
 
     }
 
@@ -205,9 +209,19 @@
             repeat: -1
         });
 
+        //SpeedBubbles
+        messageAlert = this.physics.add.staticGroup();
+
+        messageAlert = this.physics.add.sprite(bunnyNPC.x, bunnyNPC.y - 50, 'speechbubble_alert');
+        // messageAlert.setOrigin(.5, .5);
+
+
+        // messageAlert = this.physics.add.sprite(bunnyNPC.x, bunnyNPC.y - 50, 'speechbubble_alert').setOrigin(0.5, 0.5);
+        // messageAlert.setVisible(false);
+
 
         // Fox NPC walking left
-        fox = this.physics.add.sprite(600, 400, 'fox').setScale(3);
+        fox = this.physics.add.sprite(1500, 400, 'fox').setScale(3);
         fox.setCollideWorldBounds(true);
 
         this.anims.create({
@@ -218,7 +232,6 @@
         });
 
         fox.anims.play('foxWalkingLeft', true);
-
         fox.body.velocity.x = -80;
         fox.previousX = fox.x;
 
@@ -246,6 +259,9 @@
         carrotsText = this.add.text(16, 45, 'Carrots: 0', {fontSize: '32px', fill: '#000'});
         carrotsText.setScrollFactor(0);
 
+        speechBubbleText = this.add.text(bunnyNPC.x - 50, bunnyNPC.y - 150, '', {fontSize: '16px', fill: '#000'});
+        speechBubbleText.setScrollFactor(0);
+
         this.physics.world.setBounds(0, 0, 2000, 580);
 
         //  Collide the player and the carrots with the platforms
@@ -267,9 +283,11 @@
         this.physics.add.overlap(player, carrots, collectCarrots, null, this);
 
         this.physics.add.overlap(player, fox, hitFox, null, this);
-        this.physics.add.overlap(player, daisy, collectGoodPlants, null, this);
-        this.physics.add.overlap(player, dandelion, collectGoodPlants, null, this);
-        this.physics.add.overlap(player, tulip, collectBadPlants, null, this);
+        this.physics.add.overlap(player, daisy, collectPlants, null, this);
+        this.physics.add.overlap(player, dandelion, collectPlants, null, this);
+        this.physics.add.overlap(player, tulip, collectPlants, null, this);
+        this.physics.add.overlap(bunnyNPC, fox, showBunnyNPCSpeechbubble, null, this);
+        this.physics.add.overlap(bunnyNPC, daisy, showBunnyNPCSpeechbubble, null, this);
 
         /* Add in next Level */
 
@@ -293,9 +311,7 @@
 
         if (cursors.left.isDown || cursors.right.isDown) {
             isPlayerMoving = true;
-        }
-
-        else {
+        } else {
             isPlayerMoving = false;
         }
 
@@ -331,11 +347,15 @@
 
         // should run only if player is walking
         // should have a gap between Player and the NPC -> should be at the right side of the pic
-        if(isPlayerMoving) {
+        if (isPlayerMoving && bunnyNPC.x == 1600) {
+            // bunnyNPC.anims.play('bunnyNPCwalking', false);
+            bunnyNPC.x = 1600;
+        }
+        if (isPlayerMoving) {
             bunnyNPC.anims.play('bunnyNPCwalking', true);
             bunnyNPC.x = player.x + 550;
-        }
-        else {
+
+        } else {
             bunnyNPC.anims.play('bunnyNPCwalking', false);
         }
 
@@ -345,22 +365,31 @@
         gameScene.scene.start('endScreen');
     }
 
-    // Only brings health when eaten with Q
-    function collectGoodPlants(player, plant) {
-        if(keyQ.isDown){
-            plant.disableBody(true, true);
-            //  Add and update the Health
-            health += 10;
-            healthText.setText('Health: ' + health);
+    function showBunnyNPCSpeechbubble(player, figure) {
+        // messageAlert.setVisible(true);
+        messageAlert.setPosition(bunnyNPC.x - 50, bunnyNPC.y - 150);
+        if (figure == fox) {
+            speechBubbleText.setText('Vorsicht! \nFox ist da, berühre ihn nicht!');
+        }
+        if (figure == daisy) {
+            speechBubbleText.setText('Das ist Daisy.\nDaisy kannst du mit Q essen\nund gibt dir Leben.');
         }
     }
 
-    function collectBadPlants(player, plant) {
-        if(keyQ.isDown){
+
+    // Key Q will eat the plant and gives health or not
+    function collectPlants(player, plant) {
+        if (keyQ.isDown) {
             plant.disableBody(true, true);
-            //  Add and update the Health
-            health -= 10;
-            healthText.setText('Health: ' + health);
+            if (plant == daisy || plant == dandelion) {
+                //  Add and update the Health
+                health += 10;
+                healthText.setText('Health: ' + health);
+            }
+            if(plant == tulip) {
+                health -= 10;
+                healthText.setText('Health: ' + health);
+            }
         }
     }
 
