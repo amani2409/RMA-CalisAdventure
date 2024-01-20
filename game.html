@@ -36,12 +36,15 @@
         jumpVelocity = -330,
         vulnerableTime = 1000,
         camera,
+        isPlayerMoving = false,
+        speechBubble = false,
         speechBubbleText,
+        speechbubbleShown,
+        messageInfo,
         messageAlert;
 
-    var isPlayerMoving = false;
-    // var isPlayerMovingLeft = false;
-    // var isPlayerMovingRight = false;
+
+
 
     // no good plants: tulpe, lilie, efeu
     // good plants: dandelion, gaenseblümchen, basilikum
@@ -116,10 +119,6 @@
         this.load.spritesheet('bunnyNPC', 'bunnyspriteNpc.png', {frameWidth: 54, frameHeight: 50});
         this.load.spritesheet('fox', 'fox.png', {frameWidth: 36, frameHeight: 21}); // from https://opengameart.org/content/fox-wolf-pack-rework
 
-        // speechbubbles von Freepik und etwas bearbeitet
-        this.load.image('speechbubble_alert', 'speechbubble_alert.png');
-
-
     }
 
     gameScene.create = function () {
@@ -143,12 +142,17 @@
         /* setting plants */
         daisy = this.physics.add.sprite(800, 480, 'daisy').setScale(0.03);
         daisy.setOrigin(.5, .5);
+        daisy.speechbubbleShown = false;
 
         dandelion = this.physics.add.sprite(1600, 500, 'dandelion').setScale(0.05);
         dandelion.setOrigin(.5, .5);
+        dandelion.speechbubbleShown = false;
+
 
         tulip = this.physics.add.sprite(1300, 500, 'tulip').setScale(0.03);
         tulip.setOrigin(.5, .5);
+        tulip.speechbubbleShown = false;
+
 
         /* Add in next Level */
         // basil = this.physics.add.sprite(800, 500, 'basil').setScale(0.05);
@@ -209,20 +213,11 @@
             repeat: -1
         });
 
-        //SpeedBubbles
-        messageAlert = this.physics.add.staticGroup();
-
-        messageAlert = this.physics.add.sprite(bunnyNPC.x, bunnyNPC.y - 50, 'speechbubble_alert');
-        // messageAlert.setOrigin(.5, .5);
-
-
-        // messageAlert = this.physics.add.sprite(bunnyNPC.x, bunnyNPC.y - 50, 'speechbubble_alert').setOrigin(0.5, 0.5);
-        // messageAlert.setVisible(false);
-
-
         // Fox NPC walking left
         fox = this.physics.add.sprite(1500, 400, 'fox').setScale(3);
         fox.setCollideWorldBounds(true);
+        fox.speechbubbleShown = false;
+
 
         this.anims.create({
             key: 'foxWalkingLeft',
@@ -259,8 +254,6 @@
         carrotsText = this.add.text(16, 45, 'Carrots: 0', {fontSize: '32px', fill: '#000'});
         carrotsText.setScrollFactor(0);
 
-        speechBubbleText = this.add.text(bunnyNPC.x - 50, bunnyNPC.y - 150, '', {fontSize: '16px', fill: '#000'});
-        speechBubbleText.setScrollFactor(0);
 
         this.physics.world.setBounds(0, 0, 2000, 580);
 
@@ -286,8 +279,13 @@
         this.physics.add.overlap(player, daisy, collectPlants, null, this);
         this.physics.add.overlap(player, dandelion, collectPlants, null, this);
         this.physics.add.overlap(player, tulip, collectPlants, null, this);
+
+
         this.physics.add.overlap(bunnyNPC, fox, showBunnyNPCSpeechbubble, null, this);
         this.physics.add.overlap(bunnyNPC, daisy, showBunnyNPCSpeechbubble, null, this);
+        this.physics.add.overlap(bunnyNPC, dandelion, showBunnyNPCSpeechbubble, null, this);
+        this.physics.add.overlap(bunnyNPC, tulip, showBunnyNPCSpeechbubble, null, this);
+
 
         /* Add in next Level */
 
@@ -347,7 +345,7 @@
 
         // should run only if player is walking
         // should have a gap between Player and the NPC -> should be at the right side of the pic
-        if (isPlayerMoving && bunnyNPC.x == 1600) {
+        if (isPlayerMoving && bunnyNPC.x === 1600) {
             // bunnyNPC.anims.play('bunnyNPCwalking', false);
             bunnyNPC.x = 1600;
         }
@@ -366,14 +364,126 @@
     }
 
     function showBunnyNPCSpeechbubble(player, figure) {
-        // messageAlert.setVisible(true);
-        messageAlert.setPosition(bunnyNPC.x - 50, bunnyNPC.y - 150);
-        if (figure == fox) {
-            speechBubbleText.setText('Vorsicht! \nFox ist da, berühre ihn nicht!');
+
+        // if (!speechbubbleShown) {
+            // bunnyNPC.speechbubbleShown = true;
+            // console.log('Speechbubble shown for:', figure);
+            console.log('bunnyNPCSpeechbubble shown :', bunnyNPC.speechbubbleShown);
+            console.log('daisySpeechbubble shown :', daisy.speechbubbleShown);
+            console.log('foxSpeechbubble shown :', fox.speechbubbleShown);
+            console.log('dandelionSpeechbubble shown :', dandelion.speechbubbleShown);
+            console.log('tulipSpeechbubble shown :', tulip.speechbubbleShown);
+            console.log('Speechbubble shown :', speechbubbleShown);
+            // console.log('Player position:', player.x, player.y);
+            // console.log('Figure position:', figure.x, figure.y);
+            if (figure === daisy && !daisy.speechbubbleShown) {
+                gameScene.createSpeechBubble(bunnyNPC.x - 150, bunnyNPC.y - 270, 200, 200, 'Das ist Daisy.Daisy kannst du mit Q essen und gibt dir Leben.', false, daisy);
+                daisy.speechbubbleShown = true;
+            }
+            if (figure === fox && fox.speechbubbleShown === false) {
+                gameScene.createSpeechBubble(bunnyNPC.x - 150, bunnyNPC.y - 270, 100, 160, 'Vorsicht! Fox ist da, berühre ihn nicht! Du musst mit der Zeit lernen, ob du angreifen darfst oder lieber ausweichen solltest', true);
+                fox.speechbubbleShown = true;
+            }
+
+            if (figure === dandelion && dandelion.speechbubbleShown === false) {
+                gameScene.createSpeechBubble(bunnyNPC.x - 150, bunnyNPC.y - 270, 100, 160, 'Das ist Dandelion. Dandelion kannst du mit Q essen und gibt dir Leben.', false);
+                dandelion.speechbubbleShown = true;
+            }
+
+            if (figure === tulip && tulip.speechbubbleShown === false) {
+                gameScene.createSpeechBubble(bunnyNPC.x - 150, bunnyNPC.y - 270, 100, 160, 'Die Tulpe solltest du nicht essen, die ist giftig! Lauf einfach weiter', false);
+                tulip.speechbubbleShown = true;
+            }
+        // }
+    }
+
+
+    gameScene.createSpeechBubble = function (x, y, width, height, quote, alert) {
+
+        console.log('entering createSpeechBubble!!! #####');
+        const bubbleWidth = width;
+        const bubbleHeight = height;
+        const bubblePadding = 10;
+        const arrowHeight = bubbleHeight / 4;
+
+        const bubble = this.add.graphics({x: x, y: y});
+
+
+        //  Bubble shadow
+        bubble.fillStyle(0x222222, 0.5);
+        bubble.fillRoundedRect(6, 6, bubbleWidth, bubbleHeight, 16);
+
+        //  Bubble color
+        bubble.fillStyle(0xffffff, 1);
+
+        //  Bubble outline line style
+        bubble.lineStyle(4, 0x565656, 1);
+
+        //  Bubble shape and outline
+        bubble.strokeRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
+        bubble.fillRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
+
+        //  Calculate arrow coordinates
+        const point1X = Math.floor(bubbleWidth / 7);
+        const point1Y = bubbleHeight;
+        const point2X = Math.floor((bubbleWidth / 7) * 2);
+        const point2Y = bubbleHeight;
+        const point3X = Math.floor(bubbleWidth / 3);
+        const point3Y = Math.floor(bubbleHeight + arrowHeight);
+
+        //  Bubble arrow shadow
+        bubble.lineStyle(4, 0x222222, 0.5);
+        bubble.lineBetween(point2X - 1, point2Y + 6, point3X + 2, point3Y);
+
+        //  Bubble arrow fill
+        bubble.fillTriangle(point1X, point1Y, point2X, point2Y, point3X, point3Y);
+        bubble.lineStyle(2, 0x565656, 1);
+        bubble.lineBetween(point2X, point2Y, point3X, point3Y);
+        bubble.lineBetween(point1X, point1Y, point3X, point3Y);
+
+        var color;
+        if(alert){
+            color = '#FF0000FF';
         }
-        if (figure == daisy) {
-            speechBubbleText.setText('Das ist Daisy.\nDaisy kannst du mit Q essen\nund gibt dir Leben.');
+        else {
+            color = '#000000';
         }
+
+        const content = this.add.text(0, 0, quote, {
+            fontFamily: 'Arial',
+            fontSize: 20,
+            color: color,
+            align: 'center',
+            wordWrap: {width: bubbleWidth - (bubblePadding * 2)}
+        });
+
+        const b = content.getBounds();
+
+        bubble.setScrollFactor(0);
+        content.setPosition(bubble.x + (bubbleWidth / 2) - (b.width / 2), bubble.y + (bubbleHeight / 2) - (b.height / 2));
+
+        content.setScrollFactor(0);
+
+        // Faden Sie die Speechbubble aus
+        var tween = gameScene.tweens.add({
+            targets: [content, bubble],
+            alpha: 0,
+            ease: 'Linear',
+            duration: 1500,
+            onComplete: function () {
+                // Nach dem Ausfaden, setzen Sie die Alpha zurück und machen Sie die Speechbubble unsichtbar
+                [content, bubble].forEach(function (element) {
+                    element.setAlpha(1);
+                    element.setVisible(false);
+                });
+            }
+        });
+
+        // Setzen Sie die Speechbubble sichtbar, da sie in der Tween-Kette möglicherweise unsichtbar gemacht wurde
+        [content, bubble].forEach(function (element) {
+            element.setVisible(true);
+        });
+
     }
 
 
@@ -386,7 +496,7 @@
                 health += 10;
                 healthText.setText('Health: ' + health);
             }
-            if(plant == tulip) {
+            if (plant == tulip) {
                 health -= 10;
                 healthText.setText('Health: ' + health);
             }
