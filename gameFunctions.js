@@ -51,6 +51,9 @@ function collectCarrots(player, plant) {
 
     if(countCarrots >= 10){
         level2able = true;
+        countCarrots = 0;
+        this.scene.start('level2');
+
     }
 
     // if (carrots.countActive(true) === 100) {
