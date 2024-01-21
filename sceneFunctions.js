@@ -3,6 +3,7 @@ var level1Scene = new Phaser.Scene("level1");
 var level2Scene = new Phaser.Scene("level2");
 var endScreen = new Phaser.Scene("endScreen");
 
+
 titleScreen.preload = function () {
     this.load.setBaseURL("assets");
     this.load.image("main", "start.png");
@@ -32,9 +33,9 @@ titleScreen.create = function () {
         color: '#ffffff'
     }).setShadow(4, 4, "#000000", 2, false, true).setOrigin(0.5);
 
-    // if(level2able){
+    if(level2able){
         level2Text.setInteractive();
-    // }
+    }
     level2Text.on('pointerdown', function (pointer) {
         this.scene.start('level2');
     }, this);
@@ -103,7 +104,6 @@ level1Scene.create = function () {
     platforms.create(1000, 580, 'ground').setScale(2).refreshBody();
     platforms.create(1600, 580, 'ground').setScale(2).refreshBody();
     platforms.create(580, 580, 'ground').setScale(2).refreshBody();
-    platforms.create(150, 240, 'ground');
 
 
     /* setting plants */

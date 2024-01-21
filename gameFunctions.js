@@ -35,6 +35,9 @@ function collectPlants(player, plant) {
             health -= 10;
             healthText.setText('Health: ' + health);
         }
+        if(health <= 0){
+            restartGame(this);
+        }
     }
 }
 
@@ -45,6 +48,10 @@ function collectCarrots(player, plant) {
     //  Add and update the Health
     countCarrots += 1;
     carrotsText.setText('Carrots: ' + countCarrots);
+
+    if(countCarrots >= 10){
+        level2able = true;
+    }
 
     // if (carrots.countActive(true) === 100) {
     //     //  A new batch of carrots to collect
