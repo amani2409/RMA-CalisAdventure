@@ -46,18 +46,35 @@ endScreen.create = function () {
     this.add.image(400, 300, 'main');
 
     //add some text
-    this.add.text(config.width / 2, config.height / 2 + 70, 'GAME OVER\nCLICK TO RESTART', {
+    var restart = this.add.text(config.width / 2, config.height / 2 + 70, 'GAME OVER\nCLICK TO RESTART', {
         fontSize: 32,
         color: '#ffffff',
         align: 'center'
     }).setShadow(4, 4, "#000000", 2, false, true).setOrigin(0.5);
 
-    this.input.on('pointerdown', function (pointer) {
+    var homescreen = this.add.text(config.width / 2, config.height / 3, 'Return to Homescreen.', {
+        fontSize: 32,
+        color: '#ffffff'
+    }).setShadow(4, 4, "#000000", 2, false, true).setOrigin(0.5);
+
+    restart.setInteractive();
+
+    restart.on('pointerdown', function (pointer) {
         //shut down this scene and start up the game scene
-        endScreen.scene.start('gameold.html');
+        endScreen.scene.start('game.html');
         //restart the scene to reset all the variables!
         level1Scene.scene.restart();
     });
+    // scene.scene.start('endScreen');
+    homescreen.setInteractive();
+
+    homescreen.on('pointerdown', function (pointer) {
+        //shut down this scene and start up the game scene
+        endScreen.scene.start('titleScreen');
+        //restart the scene to reset all the variables!
+        this.scene.restart();
+    });
+
 }
 
 level1Scene.preload = function () {
@@ -79,6 +96,9 @@ level1Scene.preload = function () {
     this.load.image('ivy', 'ivy.png');
     this.load.image('tulip', 'tulip.png');
     this.load.image('lily', 'lily.png');
+
+    this.load.image('setting', 'setting.png');
+
 
     this.load.spritesheet('bunny', 'bunnysprite.png', {frameWidth: 80, frameHeight: 50}); //created my own bunny spritesheet
 
@@ -110,15 +130,18 @@ level1Scene.create = function () {
     daisy = this.physics.add.sprite(800, 480, 'daisy').setScale(0.03);
     daisy.setOrigin(.5, .5);
     daisy.speechbubbleShown = false;
+    level1Scene.createSpeechBubble(daisy.x - 100, daisy.y - 270, 140, 160, 'Ich bin Daisy. Mich kannst du mit Q essen und ich gebe dir Leben.', false, false);
 
     dandelion = this.physics.add.sprite(1600, 500, 'dandelion').setScale(0.05);
     dandelion.setOrigin(.5, .5);
     dandelion.speechbubbleShown = false;
+    level1Scene.createSpeechBubble(dandelion.x - 100, dandelion.y - 200, 140, 160, 'Ich bin Dandelion. Mich kannst du essen!', false, false);
 
 
     tulip = this.physics.add.sprite(1300, 500, 'tulip').setScale(0.03);
     tulip.setOrigin(.5, .5);
     tulip.speechbubbleShown = false;
+    level1Scene.createSpeechBubble(tulip.x - 100, tulip.y - 270, 140, 160, 'Ich bin Tulip. Mich solltest du nicht essen!', true, false);
 
 
     /* Add in next Level */
@@ -172,6 +195,9 @@ level1Scene.create = function () {
     // helping NPC
     bunnyNPC = this.physics.add.sprite(650, 500, 'bunnyNPC').setScale(1.5);
     bunnyNPC.setCollideWorldBounds(true);
+    level1Scene.createSpeechBubble(bunnyNPC.x - 100, bunnyNPC.y - 270, 140, 160, 'Ich bin dein HelperBunny und führe dich durch das 1. Level durch.', false, true);
+
+
 
     this.anims.create({
         key: 'bunnyNPCwalking',
@@ -184,6 +210,7 @@ level1Scene.create = function () {
     fox = this.physics.add.sprite(1500, 400, 'fox').setScale(3);
     fox.setCollideWorldBounds(true);
     fox.speechbubbleShown = false;
+    level1Scene.createSpeechBubble(fox.x - 100, fox.y - 270, 140, 160, 'Ich bin Fox.', true, true);
 
 
     this.anims.create({
@@ -221,6 +248,16 @@ level1Scene.create = function () {
     carrotsText = this.add.text(16, 45, 'Carrots: 0', {fontSize: '32px', fill: '#000'});
     carrotsText.setScrollFactor(0);
 
+    homemenu = this.add.image(config.width -20 , 20, 'setting').setScale(0.08);
+
+    homemenu.setInteractive();
+
+    homemenu.on('pointerdown', function (pointer) {
+        level1Scene.scene.start('titleScreen');
+        level1Scene.scene.restart();
+
+    });
+
 
     this.physics.world.setBounds(0, 0, 2000, 580);
 
@@ -249,9 +286,9 @@ level1Scene.create = function () {
 
 
     this.physics.add.overlap(bunnyNPC, fox, showBunnyNPCSpeechbubble, null, this);
-    this.physics.add.overlap(bunnyNPC, daisy, showBunnyNPCSpeechbubble, null, this);
-    this.physics.add.overlap(bunnyNPC, dandelion, showBunnyNPCSpeechbubble, null, this);
-    this.physics.add.overlap(bunnyNPC, tulip, showBunnyNPCSpeechbubble, null, this);
+    // this.physics.add.overlap(bunnyNPC, daisy, showBunnyNPCSpeechbubble, null, this);
+    // this.physics.add.overlap(bunnyNPC, dandelion, showBunnyNPCSpeechbubble, null, this);
+    // this.physics.add.overlap(bunnyNPC, tulip, showBunnyNPCSpeechbubble, null, this);
 
 
     /* Add in next Level */
@@ -327,124 +364,14 @@ level1Scene.update = function () {
 }
 
 
-level1Scene.createSpeechBubble = function (x, y, width, height, quote, alert) {
-
-    console.log('entering createSpeechBubble!!! #####');
-    const bubbleWidth = width;
-    const bubbleHeight = height;
-    const bubblePadding = 10;
-    const arrowHeight = bubbleHeight / 4;
-
-    const bubble = this.add.graphics({x: x, y: y});
-
-
-    //  Bubble shadow
-    bubble.fillStyle(0x222222, 0.5);
-    bubble.fillRoundedRect(6, 6, bubbleWidth, bubbleHeight, 16);
-
-    //  Bubble color
-    bubble.fillStyle(0xffffff, 1);
-
-    //  Bubble outline line style
-    bubble.lineStyle(4, 0x565656, 1);
-
-    //  Bubble shape and outline
-    bubble.strokeRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
-    bubble.fillRoundedRect(0, 0, bubbleWidth, bubbleHeight, 16);
-
-    //  Calculate arrow coordinates
-    const point1X = Math.floor(bubbleWidth / 7);
-    const point1Y = bubbleHeight;
-    const point2X = Math.floor((bubbleWidth / 7) * 2);
-    const point2Y = bubbleHeight;
-    const point3X = Math.floor(bubbleWidth / 3);
-    const point3Y = Math.floor(bubbleHeight + arrowHeight);
-
-    //  Bubble arrow shadow
-    bubble.lineStyle(4, 0x222222, 0.5);
-    bubble.lineBetween(point2X - 1, point2Y + 6, point3X + 2, point3Y);
-
-    //  Bubble arrow fill
-    bubble.fillTriangle(point1X, point1Y, point2X, point2Y, point3X, point3Y);
-    bubble.lineStyle(2, 0x565656, 1);
-    bubble.lineBetween(point2X, point2Y, point3X, point3Y);
-    bubble.lineBetween(point1X, point1Y, point3X, point3Y);
-
-    var color;
-    if(alert){
-        color = '#FF0000FF';
-    }
-    else {
-        color = '#000000';
-    }
-
-    const content = this.add.text(0, 0, quote, {
-        fontFamily: 'Arial',
-        fontSize: 20,
-        color: color,
-        align: 'center',
-        wordWrap: {width: bubbleWidth - (bubblePadding * 2)}
-    });
-
-    const b = content.getBounds();
-
-    bubble.setScrollFactor(0);
-    content.setPosition(bubble.x + (bubbleWidth / 2) - (b.width / 2), bubble.y + (bubbleHeight / 2) - (b.height / 2));
-
-    content.setScrollFactor(0);
-
-    // Faden Sie die Speechbubble aus
-    var tween = level1Scene.tweens.add({
-        targets: [content, bubble],
-        alpha: 0,
-        ease: 'Linear',
-        duration: 1500,
-        onComplete: function () {
-            // Nach dem Ausfaden, setzen Sie die Alpha zurück und machen Sie die Speechbubble unsichtbar
-            [content, bubble].forEach(function (element) {
-                element.setAlpha(1);
-                element.setVisible(false);
-            });
-        }
-    });
-
-    // Setzen Sie die Speechbubble sichtbar, da sie in der Tween-Kette möglicherweise unsichtbar gemacht wurde
-    [content, bubble].forEach(function (element) {
-        element.setVisible(true);
-    });
-
-}
-
 
 level2Scene.preload = function () {
     this.load.setBaseURL("assets");
-    this.load.image('background', 'backgroundscene2.jpg');
+    this.load.image('background2', 'background2.png');
     this.load.image('ground', 'ground.png');
-    this.load.image('carrot', 'carrot.png');
 
-
-    // good plants: dandelion, gaenseblümchen, basilikum
-    // no good plants: tulpe, lilie, efeu
-
-    // good plant:
-    this.load.image('daisy', 'daisy.png');
-    this.load.image('dandelion', 'dandelion.png');
-    this.load.image('basil', 'basil.png');
-
-    // bad plant:
-    this.load.image('ivy', 'ivy.png');
-    this.load.image('tulip', 'tulip.png');
-    this.load.image('lily', 'lily.png');
-
-    this.load.spritesheet('bunny', 'bunnysprite.png', {frameWidth: 80, frameHeight: 50}); //created my own bunny spritesheet
-
-    // NPC
-    this.load.spritesheet('fox', 'fox.png', {frameWidth: 36, frameHeight: 21}); // from https://opengameart.org/content/fox-wolf-pack-rework
-}
-
-level2Scene.create = function () {
     //  A simple background for our game
-    var background = this.add.sprite(config.width / 2, 300, 'background').setScale(3);
+    var background = this.add.sprite(config.width / 2, 300, 'background2').setScale(1);
     background.alpha = 0.8;
     background.setScrollFactor(0.2);
 
@@ -564,6 +491,9 @@ level2Scene.create = function () {
     healthText.setScrollFactor(0);
     carrotsText = this.add.text(16, 45, 'Carrots: 0', {fontSize: '32px', fill: '#000'});
     carrotsText.setScrollFactor(0);
+
+    homemenu = this.add.text(16, 45, 'Carrots: 0', {fontSize: '32px', fill: '#000'});
+    homemenu.setScrollFactor(0);
 
 
     this.physics.world.setBounds(0, 0, 2000, 580);

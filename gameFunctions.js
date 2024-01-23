@@ -1,7 +1,11 @@
 // gameFunctions.js
 function restartGame(scene) {
+    // this.scene.time.addEvent({delay: 4000, loop: false,
+    //     callback: (event) => {this.scene.events.emit('eventB')}
+    // )
     scene.scene.start('endScreen');
 }
+
 
 function playerVulnerable(game) {
     var death = game.tweens.add({
@@ -53,7 +57,6 @@ function collectCarrots(player, plant) {
         level2able = true;
         countCarrots = 0;
         this.scene.start('level2');
-
     }
 
     // if (carrots.countActive(true) === 100) {
