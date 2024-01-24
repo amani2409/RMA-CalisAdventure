@@ -5,7 +5,7 @@ function showBunnyNPCSpeechbubble(player, figure) {
         daisy.speechbubbleShown = true;
     }
     if (figure === fox && !fox.speechbubbleShown) {
-        level1Scene.createSpeechBubble(bunnyNPC.x - 150, bunnyNPC.y - 270, 100, 160, 'Vorsicht! Fox ist da, berühre ihn nicht! Du musst mit der Zeit lernen, ob du angreifen darfst oder lieber ausweichen solltest', true, true);
+        level1Scene.createSpeechBubble(bunnyNPC.x - 150, bunnyNPC.y - 350, 300, 160, 'Vorsicht! Fox ist da, berühre ihn nicht! Du musst mit der Zeit lernen, ob du angreifen darfst oder lieber ausweichen solltest', true, true);
         fox.speechbubbleShown = true;
     }
 
@@ -20,8 +20,23 @@ function showBunnyNPCSpeechbubble(player, figure) {
     }
 }
 
-// level1Scene.createPlantBubble = function (x, y, width, height, quote, alert){
+// function showTextOnly(message){
+//     this.time.delayedCall(2000, function () {
+//     this.scene.pause();
+//     }, [], this);
 //
+//     var infoMessage = this.add.text(config.width / 2, config.height / 2, message, {
+//         fontSize: 32,
+//         color: '#ffffff',
+//         align: 'center'
+//     }).setShadow(4, 4, '#000000', 2, false, true).setOrigin(0.5);
+//
+//     // infoMessage.setScrollFactor(0);
+//
+//     this.time.delayedCall(2000, function () {
+//         // infoMessage.destroy();
+//         this.scene.resume();
+//     }, [], this);
 // }
 
 

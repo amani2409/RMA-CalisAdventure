@@ -106,7 +106,7 @@ function restartGame(scene) {
 
 winScreen.create = function () {
     this.add.image(400, 300, 'win');
-    this.add.text(config.width / 2, config.height / 2 + 70, 'Du hast gewonnen! Willst du von vorne anfangen oder ins Hauptmenü kehren? ', {
+    this.add.text(config.width / 2, config.height / 3, 'Du hast gewonnen!\nWillst du von vorne anfangen\noder ins Hauptmenü kehren? ', {
         fontSize: 32,
         color: '#ffffff',
         align: 'center'
@@ -125,7 +125,7 @@ winScreen.create = function () {
         this.scene.start('level1');
     });
 
-    var homescreen = this.add.text(config.width / 2, config.height / 3, 'Zum Hauptmenü', {
+    var homescreen = this.add.text(config.width / 2, config.height / 2 + 100, 'Zum Hauptmenü', {
         fontSize: 32,
         color: '#ffffff'
     }).setShadow(4, 4, '#000000', 2, false, true).setOrigin(0.5);

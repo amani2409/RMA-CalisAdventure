@@ -42,14 +42,14 @@ function collectPlants(player, plant) {
 }
 
 
-function collectCarrots(player, plant) {
+function collectCarrots(player, plant, neededCarrots) {
     plant.disableBody(true, true);
 
     //  Add and update the Health
     countCarrots += 1;
-    carrotsText.setText('Carrots: ' + countCarrots);
+    carrotsText.setText('Carrots: ' + countCarrots + '/' + neededCarrots);
 
-    if(countCarrots >= 10){
+    if(countCarrots >= neededCarrots){
         countCarrots = 0;
 
         if(this.scene.key === 'level1'){
@@ -98,12 +98,11 @@ function hitFox(player, fox) {
             health -= 50;
             healthText.setText('Health: ' + health);
 
-            countCarrots -= 5;
+            countCarrots -= 3;
             if (countCarrots <= 0) {
                 countCarrots = 0;
             }
             carrotsText.setText('Carrots: ' + countCarrots);
-
 
             if (health <= 0) {
                 restartGame(this);

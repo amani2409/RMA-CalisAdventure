@@ -35,6 +35,10 @@ level1Scene.preload = function () {
 level1Scene.create = function () {
     resetValues();
 
+    neededCarrots = 5;
+
+    // showTextOnly.call(this,'Sammel 10 Karroten,\num das Level abzuschließen!');
+
     //  background
     var background = this.add.sprite(config.width / 2, 300, 'background');
     background.alpha = 0.8;
@@ -170,7 +174,7 @@ level1Scene.create = function () {
     healthText.setScrollFactor(0);
 
     // counts carrots
-    carrotsText = this.add.text(16, 45, 'Carrots: 0', {fontSize: '32px', fill: '#000'});
+    carrotsText = this.add.text(16, 45, 'Carrots: 0/' + neededCarrots, {fontSize: '32px', fill: '#000'});
     carrotsText.setScrollFactor(0);
 
 
@@ -192,7 +196,9 @@ level1Scene.create = function () {
     // this.physics.add.collider(lily, platforms);
 
     //  Checks to see if the player overlaps with any of the carrots, if he does call the collectPlants function
-    this.physics.add.overlap(player, carrots, collectCarrots, null, this);
+    this.physics.add.overlap(player, carrots, function (player, plant) {
+        collectCarrots.call(this, player, plant, neededCarrots);
+    }, null, this);
 
     this.physics.add.overlap(player, fox, hitFox, null, this);
     this.physics.add.overlap(player, daisy, collectPlants, null, this);
@@ -288,6 +294,8 @@ level2Scene.preload = function () {
 }
 
 level2Scene.create = function () {
+    neededCarrots = 10;
+
     resetValues();
 
     //  background
@@ -408,7 +416,7 @@ level2Scene.create = function () {
     healthText.setScrollFactor(0);
 
     // Counts Carrots
-    carrotsText = this.add.text(16, 45, 'Carrots: 0', {fontSize: '32px', fill: '#000'});
+    carrotsText = this.add.text(16, 45, 'Carrots: 0/' + neededCarrots, {fontSize: '32px', fill: '#000'});
     carrotsText.setScrollFactor(0);
 
 
@@ -430,7 +438,9 @@ level2Scene.create = function () {
     // this.physics.add.collider(lily, platforms);
 
     //  Checks to see if the player overlaps with any of the carrots, if he does call the collectPlants function
-    this.physics.add.overlap(player, carrots, collectCarrots, null, this);
+    this.physics.add.overlap(player, carrots,function (player, plant) {
+        collectCarrots.call(this, player, plant, neededCarrots);
+    }, null, this);
 
     this.physics.add.overlap(player, fox, hitFox, null, this);
     this.physics.add.overlap(player, daisy, collectPlants, null, this);
