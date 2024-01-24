@@ -1,11 +1,7 @@
-// gameFunctions.js
-function restartGame(scene) {
-    // this.scene.time.addEvent({delay: 4000, loop: false,
-    //     callback: (event) => {this.scene.events.emit('eventB')}
-    // )
-    scene.scene.start('endScreen');
+function resetValues (){
+    health = 100;
+    countCarrots = 0;
 }
-
 
 function playerVulnerable(game) {
     var death = game.tweens.add({
@@ -54,9 +50,15 @@ function collectCarrots(player, plant) {
     carrotsText.setText('Carrots: ' + countCarrots);
 
     if(countCarrots >= 10){
-        level2able = true;
         countCarrots = 0;
-        this.scene.start('level2');
+
+        if(this.scene.key === 'level1'){
+            level2able = true;
+            this.scene.start('level2');
+        }
+        else if(this.scene.key === 'level2'){
+            this.scene.start('winScreen');
+        }
     }
 
     // if (carrots.countActive(true) === 100) {
