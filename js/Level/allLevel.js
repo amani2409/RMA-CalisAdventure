@@ -1,5 +1,8 @@
 
 function createAnimation(){
+
+
+
     this.anims.create({
         key: 'left',
         frames: this.anims.generateFrameNumbers('bunny', {start: 0, end: 2}),
@@ -25,13 +28,12 @@ function createAnimation(){
         frames: [{key: 'bunny', frame: 6}],
         frameRate: 20
     });
-
     //  Input Events
-    cursors = this.input.keyboard.createCursorKeys();
-
-    // key input
-    // Q to eat -> same sprite as down
-    keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+    // cursors = this.input.keyboard.createCursorKeys();
+    //
+    // // key input
+    // // Q to eat -> same sprite as down
+    // keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
 }
 
 
@@ -48,6 +50,10 @@ function setCamera(){
 
 function updateLevelScene(){
     if (gameOver) {
+        // Stopp-Code hier einfügen
+        this.physics.world.removeCollider(level1Collider);
+        this.physics.world.removeCollider(level1Overlap);
+        this.scene.stop('level1');
         return;
     }
     if (cursors.left.isDown || cursors.right.isDown) {

@@ -1,11 +1,11 @@
+/* Level 2 Scene */
 var level2Scene = new Phaser.Scene('level2');
 
-/* Level 2 Scene */
-
 level2Scene.preload = function () {
-    this.load.setBaseURL("assets/images/backgroundScenes");
-    this.load.image('background2', '/background2.png');
-    this.load.image('ground', '/ground.png');
+    this.load.setBaseURL("assets/images");
+
+    this.load.image('background2', 'backgroundScenes/background2.png');
+    this.load.image('ground', '/backgroundScenes/ground.png');
 }
 
 
@@ -15,9 +15,10 @@ level2Scene.create = function () {
     neededCarrots = 10;
 
     /* background */
-    background = this.add.sprite(config.width / 2, 300, 'background2').setScale(1);
-    background.alpha = 0.8;
-    background.setScrollFactor(0.2);
+
+    var background2 = this.add.sprite(config.width / 2, 300, 'background2').setScale(1);
+    background2.alpha = 0.8;
+    background2.setScrollFactor(0.2);
 
     /* ground = plattforms */
     platforms = this.physics.add.staticGroup();
@@ -61,12 +62,12 @@ level2Scene.create = function () {
     fox = this.physics.add.sprite(1500, 400, 'fox').setScale(3);
     fox.setCollideWorldBounds(true);
 
-    this.anims.create({
-        key: 'foxWalkingLeft',
-        frames: this.anims.generateFrameNumbers('fox', {start: 3, end: 5}),
-        frameRate: 10,
-        repeat: -1
-    });
+    // this.anims.create({
+    //     key: 'foxWalkingLeft',
+    //     frames: this.anims.generateFrameNumbers('fox', {start: 3, end: 5}),
+    //     frameRate: 10,
+    //     repeat: -1
+    // });
 
     fox.anims.play('foxWalkingLeft', true);
     fox.body.velocity.x = -80;
@@ -77,7 +78,64 @@ level2Scene.create = function () {
     }
 
     //  Our player animations, turning, walking left, walking right and cower
+    // createAnimation.call(level2Scene);
+
+    // let animationsCreated = false;
+    //
+    // function createAnimation() {
+    //     if (!animationsCreated) {
+    //         // Deine Animationsdefinitionen hier...
+    //
+    //         animationsCreated = true;
+    //     }
+    // }
+
+    // this.anims.create({
+    //     key: 'left',
+    //     frames: this.anims.generateFrameNumbers('bunny', {start: 0, end: 2}),
+    //     frameRate: 10,
+    //     repeat: -1
+    // });
+    //
+    // this.anims.create({
+    //     key: 'turn',
+    //     frames: [{key: 'bunny', frame: 5}],
+    //     frameRate: 20
+    // });
+    //
+    // this.anims.create({
+    //     key: 'right',
+    //     frames: this.anims.generateFrameNumbers('bunny', {start: 3, end: 5}),
+    //     frameRate: 10,
+    //     repeat: -1
+    // });
+    //
+    // this.anims.create({
+    //     key: 'down',
+    //     frames: [{key: 'bunny', frame: 6}],
+    //     frameRate: 20
+    // });
+    // //  Input Events
+    // cursors = this.input.keyboard.createCursorKeys();
+    //
+    // // key input
+    // // Q to eat -> same sprite as down
+    // keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+
+// In deinen Level-Szenen rufe die createAnimation-Funktion einmal auf
     createAnimation.call(this);
+    cursors = this.input.keyboard.createCursorKeys();
+
+    // key input
+    // Q to eat -> same sprite as down
+    keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+    //
+    // //  Input Events
+    // cursors = this.input.keyboard.createCursorKeys();
+    //
+    // // key input
+    // // Q to eat -> same sprite as down
+    // keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
 
 
     //  Some carrots to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
@@ -111,11 +169,10 @@ level2Scene.create = function () {
 
     // camera following
     setCamera.call(this);
-
 }
 
 level2Scene.update = function () {
-    updateLevelScene.call(this);
+    updateLevelScene.call();
 }
 
 

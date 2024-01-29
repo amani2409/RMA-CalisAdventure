@@ -1,4 +1,3 @@
-
 function restartGame(scene) {
     scene.scene.start('transitionScene');
 }
@@ -6,7 +5,7 @@ function restartGame(scene) {
 function switchLevelScene(scene) {
     if(levelactive === 1){
         level2able = true;
-        scene.scene.start('level2');
+        scene.scene.start('transitionScene');
     }
     else if(levelactive === 2){
         scene.scene.start('winScreen');

@@ -61,7 +61,7 @@ level1Scene.create = function () {
     daisy = createNPC(this, 800, 480, 'daisy', 0.03, 'Ich bin Daisy. Mich kannst du mit Q essen und ich gebe dir Leben.', false, false);
     dandelion = createNPC(this, 1600, 500, 'dandelion', 0.05, 'Ich bin Dandelion. Mich kannst du essen!', false, false);
     tulip = createNPC(this, 1300, 500, 'tulip', 0.03, 'Ich bin Tulip. Mich solltest du nicht essen!', true, false);
-    nest = createNPC(this, 1800, 300, 'nest', 0.02, null, false, false);
+    nest = createNPC(this, 500, 300, 'nest', 0.02, null, false, false);
 
     npcPlants.add(daisy);
     npcPlants.add(dandelion);
@@ -81,7 +81,6 @@ level1Scene.create = function () {
     /* Fox NPC walking left */
     fox = this.physics.add.sprite(1500, 400, 'fox').setScale(3);
     fox.setCollideWorldBounds(true);
-    level1Scene.createSpeechBubble(fox.x - 100, fox.y - 270, 140, 160, 'Ich bin Fox.', true, true);
 
     this.anims.create({
         key: 'foxWalkingLeft',
@@ -98,10 +97,31 @@ level1Scene.create = function () {
         fox.setActive(false).setVisible(false);
     }
 
-    //  Our player animations, turning, walking left, walking right and cower
+    // //  Our player animations, turning, walking left, walking right and cower
+    // let animationsCreated = false;
+    //
+    // function createAnimation() {
+    //     if (!animationsCreated) {
+    //         // Deine Animationsdefinitionen hier...
+    //
+    //         animationsCreated = true;
+    //     }
+    // }
+
+// In deinen Level-Szenen rufe die createAnimation-Funktion einmal auf
     createAnimation.call(this);
 
+    cursors = this.input.keyboard.createCursorKeys();
 
+    // key input
+    // Q to eat -> same sprite as down
+    keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
+    // //  Input Events
+    // cursors = this.input.keyboard.createCursorKeys();
+    //
+    // // key input
+    // // Q to eat -> same sprite as down
+    // keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
     //  Some carrots to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
     carrots = this.physics.add.group({
         key: 'carrot',

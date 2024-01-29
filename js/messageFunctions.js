@@ -37,6 +37,5 @@ function createMessage(scene, x, y, width, height, text) {
             bubble.destroy();
             content.destroy();
     }, [], this);
-
 }
 

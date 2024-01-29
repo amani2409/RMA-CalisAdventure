@@ -4,6 +4,8 @@
 function resetValues (){
     health = 100;
     countCarrots = 0;
+    cursors = null;
+    keyQ = null;
 }
 
 /*
@@ -26,6 +28,7 @@ function createNPC(scene, x, y, imageKey, scale, quote, alert, bunnyNPC) {
     }
     return npc;
 }
+
 
 /*
 * overlap function with a callback function
@@ -56,24 +59,29 @@ function playerVulnerable(game) {
 * */
 function collectPlants(player, plant) {
     if (keyQ.isDown) {
-        // plant.disableBody(true, true);
         if (plant == daisy || plant == dandelion) {
             //  Add and update the Health
             health += 10;
             plant.disableBody(true, true);
-            // plant.speechbubble.disableBody(true, true);
         }
         if (plant == tulip) {
             health -= 10;
             plant.disableBody(true, true);
-            // plant.speechbubble.disableBody(true, true);
         }
         if(health <= 0){
             restartGame(this);
         }
         if(plant === nest){
             if (countCarrots >= neededCarrots){
-                switchLevelScene(this);
+                if(levelactive === 1){
+                    level2able = true;
+                    this.scene.start('level2');
+                }
+                else if(levelactive === 2){
+                    this.scene.start('winScreen');
+                }
+
+                // switchLevelScene(this);
             }
             else {
                 createMessage(this, nest.x - 300, nest.y - 500 , 200, 80 , 'Du hast noch nicht \ngenug Karrotten gesammelt!');

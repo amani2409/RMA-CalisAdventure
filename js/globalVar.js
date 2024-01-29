@@ -22,5 +22,5 @@ var player,
     vulnerableTime = 1000,
     camera,
     isPlayerMoving = false,
-    level2able = false;
+    level2able = false,
     levelactive = 1;
