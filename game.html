@@ -2,6 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/custom.css">
     <title>Calis Adventure</title>
     <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
     <style type="text/css">
@@ -12,65 +14,19 @@
 </head>
 <body>
 
-<script src="gameFunctions.js"></script>
-<script src="sceneFunctions.js"></script>
-<script src="levelSceneFunctions.js"></script>
-<script src="npcFunctions.js"></script>
+<script src="js/globalVar.js"></script>
 
-<script type="text/javascript">
-    var player,
-        bunnyNPC,
-        carrots,
-        countCarrots = 0,
-        neededCarrots,
-        carrotsText,
-        dandelion,
-        basil,
-        ivy,
-        lily,
-        tulip,
-        daisy,
-        fox,
-        platforms,
-        cursors,
-        keyQ,
-        gameOver = false,
-        health = 100,
-        healthbar,
-        healthText,
-        homemenu,
-        jumpVelocity = -330,
-        vulnerableTime = 1000,
-        camera,
-        isPlayerMoving = false,
-        speechBubble = false,
-        speechBubbleText,
-        speechbubbleShown,
-        messageInfo,
-        messageAlert,
-        level2able = false;
-        levelactive = 1;
+<script src="js/gameFunctions.js"></script>
+<script src="js/sceneFunctions.js"></script>
+<script src="js/messageFunctions.js"></script>
+<script src="js/Level/level1Function.js"></script>
+<script src="js/Level/level2Function.js"></script>
+<script src="js/Scenes/titleScreen.js"></script>
+<script src="js/Scenes/transitionScene.js"></script>
+<script src="js/Scenes/winScreen.js"></script>
+<script src="js/Scenes/endScreen.js"></script>
 
-    var config = {
-        type: Phaser.AUTO,
-        width: 800,
-        height: 600,
-        transparent: true,
-        physics: {
-            default: 'arcade',
-            arcade: {
-                gravity: {y: 300},
-                fps: 120,
-                debug: false
-            }
-        },
-        scene: [titleScreen, level1Scene, level2Scene, transitionScene, endScreen, winScreen]
-
-    };
-
-    var game = new Phaser.Game(config);
-
-</script>
+<script src="js/main.js"></script>
 
 </body>
 </html>
