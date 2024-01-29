@@ -17,20 +17,21 @@ endScreen.create = function () {
         align: 'center'
     }).setShadow(4, 4, '#000000', 2, false, true).setOrigin(0.5);
 
+    restart.setInteractive();
+    getHover(restart);
+    // should restart this level which was lost
+    restart.on('pointerdown', function (pointer) {
+        endScreen.scene.start('level' + levelactive);
+    });
+
 
     var homescreen = this.add.text(config.width / 2, config.height / 2 + 100, 'Zum Hauptmenü zurück.', {
         fontSize: 32,
         color: '#ffffff'
     }).setShadow(4, 4, '#000000', 2, false, true).setOrigin(0.5);
 
-    restart.setInteractive();
-
-    // should restart this level which was lost
-    restart.on('pointerdown', function (pointer) {
-        endScreen.scene.start('level' + levelactive);
-    });
     homescreen.setInteractive();
-
+    getHover(homescreen);
     homescreen.on('pointerdown', function (pointer) {
         endScreen.scene.start('titleScreen');
     });

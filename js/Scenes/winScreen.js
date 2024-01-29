@@ -14,9 +14,8 @@ winScreen.create = function () {
         align: 'center'
     }).setShadow(4, 4, '#000000', 2, false, true).setOrigin(0.5);
 
-
     restart.setInteractive();
-
+    getHover(restart);
     restart.on('pointerdown', function (pointer) {
         this.scene.start('level1');
     });
@@ -26,9 +25,8 @@ winScreen.create = function () {
         color: '#ffffff'
     }).setShadow(4, 4, '#000000', 2, false, true).setOrigin(0.5);
 
-
     homescreen.setInteractive();
-
+    getHover(homescreen);
     homescreen.on('pointerdown', function (pointer) {
         this.scene.start('titleScreen');
         this.scene.restart();

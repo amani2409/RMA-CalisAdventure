@@ -21,6 +21,7 @@ titleScreen.create = function () {
     }).setShadow(4, 4, '#000000', 2, false, true).setOrigin(0.5);
 
     level1Text.setInteractive();
+    getHover(level1Text);
     level1Text.on('pointerdown', function (pointer) {
         this.scene.start('level1');
     }, this);
@@ -30,11 +31,15 @@ titleScreen.create = function () {
         color: '#ffffff'
     }).setShadow(4, 4, '#000000', 2, false, true).setOrigin(0.5);
 
-    if(level2able){
+    if(level2able) {
         level2Text.setInteractive();
+        getHover(level2Text);
+        level2Text.on('pointerdown', function (pointer) {
+            this.scene.start('level2');
+        }, this);
     }
-    level2Text.on('pointerdown', function (pointer) {
-        this.scene.start('level2');
-    }, this);
+
+
+
 
 }

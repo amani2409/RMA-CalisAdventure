@@ -1,4 +1,4 @@
-function settingButton() {
+function settingButton(scene) {
     homemenu = this.add.text(config.width / 2, config.height / 3, 'Return to Homescreen.', {
         fontSize: 32,
         color: '#ffffff'
