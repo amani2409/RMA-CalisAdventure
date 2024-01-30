@@ -3,19 +3,16 @@ var level2Scene = new Phaser.Scene('level2');
 
 level2Scene.preload = function () {
     this.load.setBaseURL("assets/images");
-
     this.load.image('background2', 'backgroundScenes/background2.png');
     this.load.image('ground', '/backgroundScenes/ground.png');
 }
 
 
 level2Scene.create = function () {
-    resetValues();
     levelactive = 2;
-    neededCarrots = 10;
+    neededCarrots = 5;
 
     /* background */
-
     var background2 = this.add.sprite(config.width / 2, 300, 'background2').setScale(1);
     background2.alpha = 0.8;
     background2.setScrollFactor(0.2);
@@ -35,17 +32,22 @@ level2Scene.create = function () {
     carrotsText = this.add.text(16, 45, 'Carrots: 0/' + neededCarrots, {fontSize: '32px', fill: '#000'});
     carrotsText.setScrollFactor(0);
 
+    levelText = this.add.text(650, 16, 'Level ' + levelactive, {fontSize: '32px', fill: '#000'});
+    levelText.setScrollFactor(0);
+
     /* Creating NPCs */
     npcPlants = this.physics.add.group();
 
     daisy = createNPC(this, 800, 480, 'daisy', 0.03, null, false, false);
     dandelion = createNPC(this, 1600, 500, 'dandelion', 0.05, null, false, false);
-    tulip = createNPC(this, 1300, 500, 'tulip', 0.03, null, true, false);
+    lily = createNPC(this, 1300, 500, 'lily', 0.03, null, true, false);
+    ivy = createNPC(this, 600, 500, 'ivy', 0.03, null, true, false);
     nest = createNPC(this, 1800, 300, 'nest', 0.02, null, false, false);
 
     npcPlants.add(daisy);
-    npcPlants.add(dandelion);
+    npcPlants.add(lily);
     npcPlants.add(tulip);
+    npcPlants.add(ivy);
     npcPlants.add(nest);
 
     // The player and its settings
@@ -57,86 +59,30 @@ level2Scene.create = function () {
     player.setDrag(1);
     player.setCollideWorldBounds(true);
 
+    createAnimation(this);
 
     /* Fox NPC walking left */
-    fox = this.physics.add.sprite(1500, 400, 'fox').setScale(3);
+    fox = this.physics.add.sprite(1200, 400, 'fox').setScale(3);
     fox.setCollideWorldBounds(true);
-
-    // this.anims.create({
-    //     key: 'foxWalkingLeft',
-    //     frames: this.anims.generateFrameNumbers('fox', {start: 3, end: 5}),
-    //     frameRate: 10,
-    //     repeat: -1
-    // });
 
     fox.anims.play('foxWalkingLeft', true);
     fox.body.velocity.x = -80;
     fox.previousX = fox.x;
 
     if(fox.x < 0){
-        fox.setActive(false).setVisible(false);
+        fox.destroy();
     }
 
-    //  Our player animations, turning, walking left, walking right and cower
-    // createAnimation.call(level2Scene);
+    fox2 = this.physics.add.sprite(1800, 400, 'fox2').setScale(3);
+    fox2.setCollideWorldBounds(true);
 
-    // let animationsCreated = false;
-    //
-    // function createAnimation() {
-    //     if (!animationsCreated) {
-    //         // Deine Animationsdefinitionen hier...
-    //
-    //         animationsCreated = true;
-    //     }
-    // }
+    fox2.anims.play('fox2WalkingLeft', true);
+    fox2.body.velocity.x = -80;
+    fox2.previousX = fox2.x;
 
-    // this.anims.create({
-    //     key: 'left',
-    //     frames: this.anims.generateFrameNumbers('bunny', {start: 0, end: 2}),
-    //     frameRate: 10,
-    //     repeat: -1
-    // });
-    //
-    // this.anims.create({
-    //     key: 'turn',
-    //     frames: [{key: 'bunny', frame: 5}],
-    //     frameRate: 20
-    // });
-    //
-    // this.anims.create({
-    //     key: 'right',
-    //     frames: this.anims.generateFrameNumbers('bunny', {start: 3, end: 5}),
-    //     frameRate: 10,
-    //     repeat: -1
-    // });
-    //
-    // this.anims.create({
-    //     key: 'down',
-    //     frames: [{key: 'bunny', frame: 6}],
-    //     frameRate: 20
-    // });
-    // //  Input Events
-    // cursors = this.input.keyboard.createCursorKeys();
-    //
-    // // key input
-    // // Q to eat -> same sprite as down
-    // keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-
-// In deinen Level-Szenen rufe die createAnimation-Funktion einmal auf
-    createAnimation.call(this);
-    cursors = this.input.keyboard.createCursorKeys();
-
-    // key input
-    // Q to eat -> same sprite as down
-    keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-    //
-    // //  Input Events
-    // cursors = this.input.keyboard.createCursorKeys();
-    //
-    // // key input
-    // // Q to eat -> same sprite as down
-    // keyQ = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);
-
+    if(fox2.x < 0){
+        fox2.destroy();
+    }
 
     //  Some carrots to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
     carrots = this.physics.add.group({
@@ -157,6 +103,7 @@ level2Scene.create = function () {
     this.physics.add.collider(player, platforms);
     this.physics.add.collider(carrots, platforms);
     this.physics.add.collider(fox, platforms);
+    this.physics.add.collider(fox2, platforms);
     this.physics.add.collider(npcPlants, platforms);
 
     // Overlapping
@@ -164,15 +111,18 @@ level2Scene.create = function () {
         collectCarrots.call(this, player, plant, neededCarrots);
     }, null, this);
     addOverlap(this, player, fox, hitFox);
+    addOverlap(this, player, fox2, hitFox);
     addOverlap(this, player, npcPlants, collectPlants.bind(this));
-    addOverlap(this, player, nest, collectPlants.bind(this));
+    this.physics.add.overlap(player, nest, function (player, nest) {
+        getExit.call(this, player, nest, neededCarrots);
+    }, null, this);
 
     // camera following
     setCamera.call(this);
 }
 
 level2Scene.update = function () {
-    updateLevelScene.call();
+    updateLevelScene(this);
 }
 
 

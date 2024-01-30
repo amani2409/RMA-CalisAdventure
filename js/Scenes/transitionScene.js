@@ -9,6 +9,6 @@ transitionScene.create = function () {
     }).setShadow(4, 4, '#000000', 2, false, true).setOrigin(0.5);
 
     this.time.delayedCall(2000, function () {
-        this.scene.start('endScreen');
+        this.scene.start('lostScreen');
     }, [], this);
 };

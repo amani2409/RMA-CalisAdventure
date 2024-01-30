@@ -5,10 +5,18 @@ titleScreen.preload = function () {
     this.load.image('main', 'start.png');
     this.load.image('win', 'winscreen.png');
     this.load.image('lost', 'lostscene.png');
+
+    this.load.audio('backgroundSound', '../../sounds/good-night-160166.mp3'); // Music by FASSounds from Pixabay
 }
 
 titleScreen.create = function () {
     this.add.image(400, 300, 'main');
+
+    if(!musicPlaying){
+        this.music = this.sound.add('backgroundSound');
+        playMusic(this.music);
+        musicPlaying = true;
+    }
 
     this.add.text(config.width / 2, config.height / 3, 'Willkommen bei Calis adventure \n\nUm Level 2 freizuschalten \nmusst du Level 1 abschließen.', {
         fontSize: 32,
@@ -38,8 +46,5 @@ titleScreen.create = function () {
             this.scene.start('level2');
         }, this);
     }
-
-
-
 
 }

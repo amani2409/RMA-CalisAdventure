@@ -11,9 +11,7 @@ var config = {
             debug: false
         }
     },
-
-    // scene: [titleScreen, level1Scene, level2Scene, transitionScene, endScreen, winScreen]
-    scene: [titleScreen, level1Scene, transitionScene, endScreen, level2Scene, winScreen]
+    scene: [titleScreen, level1Scene, transitionScene, lostScreen, level2Scene, winScreen]
 };
 
 var game = new Phaser.Game(config);
