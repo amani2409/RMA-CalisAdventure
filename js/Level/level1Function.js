@@ -91,7 +91,6 @@ level1Scene.create = function () {
     fox.previousX = fox.x;
 
 
-
     // https://phaser.io/tutorials/making-your-first-phaser-3-game/part8
     carrots = this.physics.add.group({
         key: 'carrot',

@@ -17,7 +17,7 @@ lostScreen.create = function () {
 
     restart.setInteractive();
     getHover(restart);
-    // should restart this level which was lost
+    // should restart this level where was lost
     restart.on('pointerdown', function (pointer) {
         lostScreen.scene.start('level' + levelactive);
     });

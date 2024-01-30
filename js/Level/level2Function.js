@@ -7,10 +7,9 @@ level2Scene.preload = function () {
     this.load.image('ground', '/backgroundScenes/ground.png');
 }
 
-
 level2Scene.create = function () {
     levelactive = 2;
-    neededCarrots = 5;
+    neededCarrots = 2;
 
     /* background */
     var background2 = this.add.sprite(config.width / 2, 300, 'background2').setScale(1);

@@ -24,7 +24,6 @@ function playMusic(music) {
         volume: 0.3,
     });
     musicPlaying = true;
-
 }
 
 

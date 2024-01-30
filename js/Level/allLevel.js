@@ -1,5 +1,6 @@
 /*
 * https://phaser.io/tutorials/making-your-first-phaser-3-game/part7
+* added my part, changed a little bit
 * */
 
 function createAnimation(scene) {
@@ -68,7 +69,10 @@ function setCamera() {
     camera.setFollowOffset(-200, 120);
 }
 
-
+/*
+* https://phaser.io/tutorials/making-your-first-phaser-3-game/part7
+* added my part, changed a little bit
+* */
 function updateLevelScene(scene) {
     cursors = scene.input.keyboard.createCursorKeys();
     keyQ = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Q);

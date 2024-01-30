@@ -99,7 +99,6 @@ function getExit(player, nest, neededCarrots) {
     }
 }
 
-
 /*
 * collecting carrots
 * */
